@@ -70,6 +70,7 @@ void ParticleController::update()
  
     mLocations.assign(numParticles, Vec2f(0.0f,0.0f));
     mVelocities.assign(numParticles, Vec2f(0.0f,0.0f));
+	mCollisions.clear();
 
 	Vec2f cog = Vec2f(0.0f,0.0f);
     
@@ -109,17 +110,26 @@ void ParticleController::update()
 
 				if (d2 <= 500.0f) // make mRadius 11.180339887498948482045868343656f
 				{
-					float X     = cinder::math<float>::sqrt(A.x * A.x);
-					float Y     = cinder::math<float>::sqrt(A.y * A.y);
-					float theta = cinder::math<float>::atan2(Y, X);
-
-					Vec2f tempP = mVelocities[i];
-					Vec2f tempQ = mVelocities[j];
+					std::multimap<unsigned,unsigned>::iterator it = mCollisions.end();
+					std::pair<std::multimap<unsigned,unsigned>::iterator, std::multimap<unsigned,unsigned>::iterator> range = mCollisions.equal_range(i); 
 					
-					mVelocities[i].x = (cinder::math<float>::sin(theta) * tempQ.y - cinder::math<float>::cos(theta) * tempQ.x);
-					mVelocities[i].y = (cinder::math<float>::cos(theta) * tempQ.y + cinder::math<float>::sin(theta) * tempQ.x);
-					mVelocities[j].x = (cinder::math<float>::sin(theta) * tempP.y - cinder::math<float>::cos(theta) * tempP.x);
-					mVelocities[j].y = (cinder::math<float>::cos(theta) * tempP.y + cinder::math<float>::sin(theta) * tempP.x);
+					if ((it = range.first) == mCollisions.end())
+					{
+						mCollisions.insert(std::pair<unsigned,unsigned>(i,j));
+						mCollisions.insert(std::pair<unsigned,unsigned>(j,i));
+
+						float X     = cinder::math<float>::sqrt(A.x * A.x);
+						float Y     = cinder::math<float>::sqrt(A.y * A.y);
+						float theta = 1.5707963267948966192313216916398f - cinder::math<float>::atan2(Y, X);
+
+						Vec2f tempP = mVelocities[i];
+						Vec2f tempQ = mVelocities[j];
+				
+						mVelocities[i].x = (cinder::math<float>::sin(theta) * tempQ.y - cinder::math<float>::cos(theta) * tempQ.x);
+						mVelocities[i].y = (cinder::math<float>::cos(theta) * tempQ.y + cinder::math<float>::sin(theta) * tempQ.x);
+						mVelocities[j].x = (cinder::math<float>::sin(theta) * tempP.y - cinder::math<float>::cos(theta) * tempP.x);
+						mVelocities[j].y = (cinder::math<float>::cos(theta) * tempP.y + cinder::math<float>::sin(theta) * tempP.x);
+					}
 
 					Ploc -> setImpact();
 					Qloc -> setImpact();

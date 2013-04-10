@@ -16,6 +16,7 @@
 #include "Particle.h"
 #include <list>
 #include <vector>
+#include <map>
 
 /*---------------------------------------------------------------------------
 **
@@ -39,6 +40,7 @@ protected:
     std::list<Particle> mParticles;
     std::vector<ci::Vec2f> mLocations;
     std::vector<ci::Vec2f> mVelocities;
+	std::multimap<unsigned, unsigned> mCollisions;
     
     float mFrameRate;
 };

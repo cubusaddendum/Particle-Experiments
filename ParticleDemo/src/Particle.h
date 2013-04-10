@@ -44,7 +44,7 @@ public:
     inline void setField ( float field ) { mField = field; }
 	inline void setRadius ( float radius ) { mRadius = radius; }
 
-	inline void setImpact () { if (mImpact < 2.0f) mImpact = 4.0f; }
+	inline void setImpact () { if (mImpact == 0.0f) mImpact = 4.0f; }
 
 protected:
     

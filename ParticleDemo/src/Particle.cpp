@@ -75,9 +75,11 @@ void Particle::draw()
 
 	if (mImpact > 0.0f)
 	{
-		float offset = 4.0f - mImpact;
+		float offset  = 4.0f - mImpact;
+		unsigned history = static_cast<unsigned>(offset);
+
 		gl::color (1.0f, 1.0f, 0.9f, 0.125f * mImpact);
-		gl::drawSolidCircle ( mPastLocations[NTRAIL - 1u], (7.180339887498948482045868343656f + offset));
+		gl::drawSolidCircle ( mPastLocations[NTRAIL - (history + 1u)], (7.180339887498948482045868343656f + offset));
 
 		mImpact -= 1.0f;
 	}
