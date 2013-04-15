@@ -21,6 +21,7 @@
 */
 
 using namespace ci;
+using namespace cinder;
 using std::list;
 
 namespace 
@@ -95,50 +96,64 @@ void ParticleController::update()
     }
 
 	list<Particle>::iterator Ploc = mParticles.begin();
-	list<Particle>::iterator Qloc = mParticles.begin();
-
-	for ( unsigned i = 0u; i < numParticles; ++i )
+	
+	for ( unsigned i = 0u; i < numParticles - 1u; ++i )
     {
-        for ( unsigned j = 0u; j < numParticles; ++j )
+		list<Particle>::iterator Qloc = mParticles.begin();
+
+		for ( unsigned j = 0; j < i + 1u; ++j )
         {
-            if (i != j)
-            {
-				Vec2f A = mLocations[i] - mLocations[j];
-				Vec2f B = mVelocities[i] - mVelocities[j];
+			Qloc++;
+		}
 
-				float d2 = (((A.x * A.x) + (A.y * A.y)) - ((A.x * B.x) + (A.y * B.y)) / ((B.x * B.x) + (B.y * B.y)));
+        for ( unsigned j = i + 1u; j < numParticles; ++j )
+        {
 
-				if (d2 <= 500.0f) // make mRadius 11.180339887498948482045868343656f
+			Vec2f A = mLocations[j] - mLocations[i];
+			Vec2f B = mVelocities[j] - mVelocities[i];
+
+			float d2 = (((A.x * A.x) + (A.y * A.y)) - ((A.x * B.x) + (A.y * B.y)) / ((B.x * B.x) + (B.y * B.y)));
+
+			if (d2 <= 100.0f) // assume radius is 5
+			{
+				std::multimap<unsigned,unsigned>::iterator it = mCollisions.end();
+				bool bUnique = true;
+
+				for (it = mCollisions.begin(); it != mCollisions.end(); ++it)
 				{
-					std::multimap<unsigned,unsigned>::iterator it = mCollisions.end();
-					std::pair<std::multimap<unsigned,unsigned>::iterator, std::multimap<unsigned,unsigned>::iterator> range = mCollisions.equal_range(i); 
-					
-					if ((it = range.first) == mCollisions.end())
+					if ((it -> first == i) && (it -> second == j))
 					{
-						mCollisions.insert(std::pair<unsigned,unsigned>(i,j));
-						mCollisions.insert(std::pair<unsigned,unsigned>(j,i));
-
-						float X     = cinder::math<float>::sqrt(A.x * A.x);
-						float Y     = cinder::math<float>::sqrt(A.y * A.y);
-						float theta = 1.5707963267948966192313216916398f - cinder::math<float>::atan2(Y, X);
-
-						Vec2f tempP = mVelocities[i];
-						Vec2f tempQ = mVelocities[j];
-				
-						mVelocities[i].x = (cinder::math<float>::sin(theta) * tempQ.y - cinder::math<float>::cos(theta) * tempQ.x);
-						mVelocities[i].y = (cinder::math<float>::cos(theta) * tempQ.y + cinder::math<float>::sin(theta) * tempQ.x);
-						mVelocities[j].x = (cinder::math<float>::sin(theta) * tempP.y - cinder::math<float>::cos(theta) * tempP.x);
-						mVelocities[j].y = (cinder::math<float>::cos(theta) * tempP.y + cinder::math<float>::sin(theta) * tempP.x);
+						bUnique = false;
 					}
-
-					Ploc -> setImpact();
-					Qloc -> setImpact();
 				}
-            }
+				
+				if (bUnique)
+				{
+					mCollisions.insert(std::pair<unsigned,unsigned>(i,j));
+					mCollisions.insert(std::pair<unsigned,unsigned>(j,i));
+
+					float phi; A.x == 0.0f ? phi = 1.5707963267948966192313216916398f : phi = atan2(A.y,A.x); // does this deal with dX = 0?
+
+					float Pvi = sqrt(mVelocities[i].x * mVelocities[i].x + mVelocities[i].y * mVelocities[i].y);
+					float Qvi = sqrt(mVelocities[j].x * mVelocities[j].x + mVelocities[j].y * mVelocities[j].y);
+
+					float thetaP = atan2(mVelocities[i].y,mVelocities[i].x);
+					float thetaQ = atan2(mVelocities[j].y,mVelocities[j].x);
+
+					mVelocities[i].x = cos(phi)*(Qvi * cos(thetaQ - phi)) - sin(phi)*(Pvi * sin(thetaP - phi));
+					mVelocities[i].y = sin(phi)*(Qvi * cos(thetaQ - phi)) + cos(phi)*(Pvi * sin(thetaP - phi));
+					mVelocities[j].x = cos(phi)*(Pvi * cos(thetaP - phi)) - sin(phi)*(Qvi * sin(thetaQ - phi));
+					mVelocities[j].y = sin(phi)*(Pvi * cos(thetaP - phi)) + cos(phi)*(Qvi * sin(thetaQ - phi));
+				}
+
+				Ploc -> setImpact();
+				Qloc -> setImpact();
+			}
+
+			++Qloc;
         }
 
 		++Ploc;
-		++Qloc;
 	}
     
     n = 0u;
@@ -175,8 +190,8 @@ void ParticleController::addParticles( unsigned numParticles )
 		float rwidth = Rand::randFloat(-1.0f,1.0f) * static_cast<float>(app::getWindowWidth() < app::getWindowHeight() ? app::getWindowWidth() >> 1 : app::getWindowHeight() >> 1);
 		float theta  = Rand::randFloat(6.283185307179586476925286766559f); 
 
-		float x = rwidth * cinder::math<float>::sin(theta); 	
-		float y = rwidth * cinder::math<float>::cos(theta);
+		float x = rwidth * sin(theta); 	
+		float y = rwidth * cos(theta);
 
 		centre.x += x;
 		centre.y += y;
