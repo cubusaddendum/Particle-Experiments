@@ -21,14 +21,29 @@ Particle::Particle( Vec2f loc ) :
 {
 }
 
-void Particle::update( const float& dT )
+void Particle::update( const float& dT, unsigned mode )
 {
-    mScale = (cos( 0.628318530717959f * dT ) + 0.5f ) * 10.0f;
+    float xyOffset ;
     
-    //float xyOffset = sin( cos( sin( mLoc.y * 0.3183f ) + cos( mLoc.x * 0.3183f ) ) ) + 1.0f;
-    //mRadius = (sin( 0.628318530717959f * dT ) + 0.5f ) * xyOffset * xyOffset * 1.8f;
-    //mRadius = ( sin( 0.000628318530717959f * dT * mLoc.y * mLoc.x ) + 1.0f ) * 2.0f;
-    //mRadius = cos( 0.628318530717959f * dT * mLoc.y * 0.1f ) + sin( 0.942477796076938 * dT * mLoc.x * 0.1f ) + 2.0f;
+    switch (mode)
+    {
+        case 1:
+            mScale = (cos( 0.628318530717959f * dT ) + 0.5f ) * 10.0f;
+            break;
+    
+        case 2:
+            xyOffset = sin( cos( sin( mLoc.y * 0.3183f ) + cos( mLoc.x * 0.3183f ) ) ) + 1.0f;
+            mRadius = (sin( 0.628318530717959f * dT ) + 0.5f ) * xyOffset * xyOffset * 1.8f;
+            break;
+    
+        case 3:
+            mRadius = ( sin( 0.000628318530717959f * dT * mLoc.y * mLoc.x ) + 1.0f ) * 2.0f;
+            break;
+            
+        case 4:
+            mRadius = cos( 0.628318530717959f * dT * mLoc.y * 0.1f ) + sin( 0.942477796076938 * dT * mLoc.x * 0.1f ) + 2.0f;
+        
+    }
 }
 
 void Particle::update( const Channel32f& channel )

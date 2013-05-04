@@ -16,6 +16,7 @@ public:
 	void setup();
 	void update();
 	void draw();
+    void keyDown( KeyEvent event );
 	
 	Channel32f mChannel;
 	
@@ -49,6 +50,26 @@ void NewpaperPrintApp::draw()
 	glDisable( GL_TEXTURE_2D );
 	glColor3f( 1, 1, 1 );
 	mParticleController.draw();
+}
+
+void NewpaperPrintApp::keyDown( KeyEvent event )
+{
+    if ( event.getChar() == '1' )
+    {
+        mParticleController.setMode(1);
+    }
+    else if ( event.getChar() == '2' )
+    {
+        mParticleController.setMode(2);
+    }
+    else if ( event.getChar() == '3' )
+    {
+        mParticleController.setMode(3);
+    }
+    else if ( event.getChar() == '4' )
+    {
+        mParticleController.setMode(4);
+    }
 }
 
 

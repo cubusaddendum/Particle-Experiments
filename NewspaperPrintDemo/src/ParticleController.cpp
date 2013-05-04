@@ -10,7 +10,8 @@ using std::list;
 ParticleController::ParticleController() :
     mXRes(80),
     mYRes(60),
-    mDT(60.0f)
+    mDT(60.0f),
+    mMode(1u)
 {
     for( int y = 0; y < mYRes; y++ )
     {
@@ -28,7 +29,7 @@ void ParticleController::update()
 	for( list<Particle>::iterator p = mParticles.begin(); p != mParticles.end(); ++p )
     {
         p -> update( mChannel );
-		p -> update(time);
+		p -> update(time, mMode);
 	}
     
     
