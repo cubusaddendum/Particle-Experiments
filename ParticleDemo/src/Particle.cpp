@@ -35,7 +35,7 @@ Particle::Particle( Vec2f location, float frameRate ) :
     mPastLocations(),
     mLoc(location),
     mVel(Vec2f(0.0f, 0.0f)),
-    mMass(0.001f),
+    mMass(1500000000000000.0f), //1500000000000000.0f
     mField(1.0f),
     mRadius(5.0f),
     mDT(1.0f/frameRate),

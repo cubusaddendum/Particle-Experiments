@@ -26,6 +26,8 @@ using std::list;
 
 namespace 
 {
+    static const float GravConst = 6.667221937e-11;
+    
 	bool outofbounds(Particle& particle) 
 	{
 		float rightbound = 1.1f * static_cast<float>(app::getWindowWidth());
@@ -62,8 +64,7 @@ void ParticleController::update()
 {
     unsigned numParticles = mParticles.size();
 	float dT = 1.0f/mFrameRate;
-	float cscale = 1.0f/numParticles;
-	unsigned n = 0u;
+	
 
 	mParticles.remove_if (outofbounds);
 
@@ -71,28 +72,52 @@ void ParticleController::update()
  
     mLocations.assign(numParticles, Vec2f(0.0f,0.0f));
     mVelocities.assign(numParticles, Vec2f(0.0f,0.0f));
-	mCollisions.clear();
 
-	Vec2f cog = Vec2f(0.0f,0.0f);
+	mCollisions.clear();
+    
+    //! Acquire total particle mass
+    float Nmass = 0.0f;
+    
+    for( list<Particle>::iterator p = mParticles.begin(); p != mParticles.end(); ++p)
+    {
+        Nmass += p -> getMass();
+    }
+    
+    //! Invert Nmass to take division out of the following recursion
+    Nmass = 1.0f / Nmass;
+    
+    //! Acquire centre of particle gravity
+    Vec2f cog = Vec2f(0.0f,0.0f);
+    unsigned n = 0u;
     
    	for( list<Particle>::iterator p = mParticles.begin(); p != mParticles.end(); ++p)
     {
 		mLocations[n] = ( p -> getLocation() );
-		cog += mLocations[n] * cscale; 
+		cog += mLocations[n] * p -> getMass() * Nmass; //! effectively divided-by Nmass
         mVelocities[n++] = ( p -> getVelocity() );
 	}
     
+    Nmass = 1.0f / Nmass; //! Invert again to avoid division in the next recursion
+    
     for ( unsigned i = 0u; i < numParticles; ++i )
     {
-		Vec2f d = cog - mLocations[i];
+		Vec2f r = cog - mLocations[i];
 
-		float sdx; (d.x < 0.0f ? sdx = -1.0f : sdx = 1.0f);
-		float sdy; (d.y < 0.0f ? sdy = -1.0f : sdy = 1.0f);
-
-        Vec2f acc = Vec2f(sdx * numParticles * 100000.0f / cinder::math< float >::pow(Vec2f(cog - dT*mVelocities[i]).x, 2.0f), 
-			sdy * numParticles * 100000.0f / cinder::math< float >::pow(Vec2f(cog - dT*mVelocities[i]).y, 2.0f));
+		float sdx; (r.x < 0.0f ? sdx = -1.0f : sdx = 1.0f);
+		float sdy; (r.y < 0.0f ? sdy = -1.0f : sdy = 1.0f);
         
-        mVelocities[i] += acc * dT;
+        Vec2f d  = cog - dT * mVelocities[i];
+        float d2 = d.x * d.x + d.y * d.y;
+        Vec2f dhat = d / cinder::math<float>::sqrt(d2);
+        
+        Vec2f g = dhat * Vec2f(GravConst * sdx * Nmass / d2, GravConst * sdy * Nmass / d2);
+        
+        mVelocities[i] += g * dT;
+        
+        /*Vec2f acc = Vec2f(GravConst * sdx * Nmass / cinder::math< float >::pow(Vec2f(cog - dT * mVelocities[i]).x, 2.0f),
+			GravConst * sdy * Nmass / cinder::math< float >::pow(Vec2f(cog - dT * mVelocities[i]).y, 2.0f));
+        
+        mVelocities[i] += acc * dT;*/
     }
 
 	list<Particle>::iterator Ploc = mParticles.begin();
