@@ -138,8 +138,10 @@ void ParticleController::update()
 			Vec2f B = mVelocities[j] - mVelocities[i];
 
 			float d2 = (((A.x * A.x) + (A.y * A.y)) - ((A.x * B.x) + (A.y * B.y)) / ((B.x * B.x) + (B.y * B.y)));
+            
+            float threshold = (Ploc -> getRadius() + Qloc -> getRadius()) * (Ploc -> getRadius() + Qloc -> getRadius());
 
-			if (d2 <= 100.0f) // assume radius is 5
+			if (d2 <= threshold)
 			{
 				std::multimap<unsigned,unsigned>::iterator it = mCollisions.end();
 				bool bUnique = true;
@@ -162,17 +164,31 @@ void ParticleController::update()
 					float Pvi = sqrt(mVelocities[i].x * mVelocities[i].x + mVelocities[i].y * mVelocities[i].y);
 					float Qvi = sqrt(mVelocities[j].x * mVelocities[j].x + mVelocities[j].y * mVelocities[j].y);
 
-					float thetaP = atan2(mVelocities[i].y,mVelocities[i].x);
-					float thetaQ = atan2(mVelocities[j].y,mVelocities[j].x);
-
-					mVelocities[i].x = cos(phi)*(Qvi * cos(thetaQ - phi)) - sin(phi)*(Pvi * sin(thetaP - phi));
-					mVelocities[i].y = sin(phi)*(Qvi * cos(thetaQ - phi)) + cos(phi)*(Pvi * sin(thetaP - phi));
-					mVelocities[j].x = cos(phi)*(Pvi * cos(thetaP - phi)) - sin(phi)*(Qvi * sin(thetaQ - phi));
-					mVelocities[j].y = sin(phi)*(Pvi * cos(thetaP - phi)) + cos(phi)*(Qvi * sin(thetaQ - phi));
+					float thetaP = atan2(mVelocities[i].y, mVelocities[i].x);
+					float thetaQ = atan2(mVelocities[j].y, mVelocities[j].x);
+                    
+                    //! Acquire mass of each particle
+                    float Pm = Ploc -> getMass();
+                    float Qm = Qloc -> getMass();
+                    float totalMass_1  = 1.0f / (Pm + Qm);
+                    
+                    //! Derived velocity on-axis
+                    float Pvrx = Pvi * cos(thetaP - phi);
+                    float Qvrx = Qvi * cos(thetaQ - phi);
+                    
+                    //! Exchange momentum
+                    Vec2f Pvr = Vec2f(((Pm - Qm) * Pvrx + (Qm + Qm) * Qvrx) * totalMass_1, Pvi * sin(thetaP - phi) );
+                    Vec2f Qvr = Vec2f(((Pm + Pm) * Pvrx + (Qm - Pm) * Qvrx) * totalMass_1, Qvi * sin(thetaQ - phi) );
+                    
+                    //! Compute new velocities of each particle
+                    mVelocities[i].x = cos(phi) * Pvr.x - sin (phi) * Pvr.y;
+					mVelocities[i].y = sin(phi) * Pvr.x + cos (phi) * Pvr.y;
+                    mVelocities[j].x = cos(phi) * Qvr.x - sin (phi) * Qvr.y;
+					mVelocities[j].y = sin(phi) * Qvr.x + cos (phi) * Qvr.y;
 				}
 
-				Ploc -> setImpact();
-				Qloc -> setImpact();
+				//Ploc -> setImpact();
+				//Qloc -> setImpact();
 			}
 
 			++Qloc;
@@ -220,8 +236,11 @@ void ParticleController::addParticles( unsigned numParticles )
 
 		centre.x += x;
 		centre.y += y;
+
+        float radius = Rand::randFloat(1.0f, 3.0f);
+        float mass   = 3580986219567.6f * /* 4/3 pi */ 4.18879020478638f * radius * radius * radius;
         
-		mParticles.push_back( Particle( centre, mFrameRate ) );
+		mParticles.push_back( Particle( centre, mFrameRate, mass, radius ) );
 	}
 }
 

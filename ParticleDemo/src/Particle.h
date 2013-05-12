@@ -27,6 +27,8 @@ class Particle
     
 public:
 	explicit Particle( ci::Vec2f location, float frameRate );
+    explicit Particle( ci::Vec2f location, float frameRate, float mass );
+    explicit Particle( ci::Vec2f location, float frameRate, float mass, float radius );
 	void update();
 	void draw();
     

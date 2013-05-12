@@ -46,6 +46,40 @@ Particle::Particle( Vec2f location, float frameRate ) :
 }
 
 /*---------------------------------------------------------------------------
+ **
+ */
+Particle::Particle( Vec2f location, float frameRate, float mass ) :
+    mPastLocations(),
+    mLoc(location),
+    mVel(Vec2f(0.0f, 0.0f)),
+    mMass(mass),
+    mField(1.0f),
+    mRadius(5.0f),
+    mDT(1.0f/frameRate),
+    mImpact(0.0f)
+{
+    mPastLocations.resize(NTRAIL);
+    mPastLocations.assign (NTRAIL, mLoc);
+}
+
+/*---------------------------------------------------------------------------
+ **
+ */
+Particle::Particle( Vec2f location, float frameRate, float mass, float radius ) :
+    mPastLocations(),
+    mLoc(location),
+    mVel(Vec2f(0.0f, 0.0f)),
+    mMass(mass),
+    mField(1.0f),
+    mRadius(radius),
+    mDT(1.0f/frameRate),
+    mImpact(0.0f)
+{
+    mPastLocations.resize(NTRAIL);
+    mPastLocations.assign (NTRAIL, mLoc);
+}
+
+/*---------------------------------------------------------------------------
 **
 */
 
