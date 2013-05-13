@@ -28,6 +28,9 @@ namespace
 {
     static const float GravConst = 6.667221937e-11;
     
+    /*---------------------------------------------------------------------------
+    **
+    */
 	bool outofbounds(Particle& particle) 
 	{
 		float rightbound = 1.1f * static_cast<float>(app::getWindowWidth());
@@ -44,6 +47,19 @@ namespace
 			return true;
 		}
 
+		return false;
+	}
+    
+    /*---------------------------------------------------------------------------
+    **
+    */
+    bool destroyed(Particle& particle)
+	{
+		if (particle.getMass() <= 0.0f)
+		{
+			return true;
+		}
+        
 		return false;
 	}
 };
@@ -67,6 +83,7 @@ void ParticleController::update()
 	
 
 	mParticles.remove_if (outofbounds);
+    mParticles.remove_if (destroyed);
 
 	addParticles( numParticles - mParticles.size() );
  
@@ -108,7 +125,7 @@ void ParticleController::update()
         
         Vec2f d  = cog - dT * mVelocities[i];
         float d2 = d.x * d.x + d.y * d.y;
-        Vec2f dhat = d / cinder::math<float>::sqrt(d2);
+        Vec2f dhat = d / math<float>::sqrt(d2);
         
         Vec2f g = dhat * Vec2f(GravConst * sdx * Nmass / d2, GravConst * sdy * Nmass / d2);
         
@@ -139,7 +156,9 @@ void ParticleController::update()
 
 			float d2 = (((A.x * A.x) + (A.y * A.y)) - ((A.x * B.x) + (A.y * B.y)) / ((B.x * B.x) + (B.y * B.y)));
             
-            float threshold = (Ploc -> getRadius() + Qloc -> getRadius()) * (Ploc -> getRadius() + Qloc -> getRadius());
+            float Pradius = Ploc -> getRadius();
+            float Qradius = Qloc -> getRadius();
+            float threshold = (Pradius + Qradius) * (Pradius + Qradius);
 
 			if (d2 <= threshold)
 			{
@@ -160,6 +179,8 @@ void ParticleController::update()
 					mCollisions.insert(std::pair<unsigned,unsigned>(j,i));
 
 					float phi; A.x == 0.0f ? phi = 1.5707963267948966192313216916398f : phi = atan2(A.y,A.x); // does this deal with dX = 0?
+                    float cosPhi = cos(phi);
+                    float sinPhi = sin(phi);
 
 					float Pvi = sqrt(mVelocities[i].x * mVelocities[i].x + mVelocities[i].y * mVelocities[i].y);
 					float Qvi = sqrt(mVelocities[j].x * mVelocities[j].x + mVelocities[j].y * mVelocities[j].y);
@@ -181,14 +202,17 @@ void ParticleController::update()
                     Vec2f Qvr = Vec2f(((Pm + Pm) * Pvrx + (Qm - Pm) * Qvrx) * totalMass_1, Qvi * sin(thetaQ - phi) );
                     
                     //! Compute new velocities of each particle
-                    mVelocities[i].x = cos(phi) * Pvr.x - sin (phi) * Pvr.y;
-					mVelocities[i].y = sin(phi) * Pvr.x + cos (phi) * Pvr.y;
-                    mVelocities[j].x = cos(phi) * Qvr.x - sin (phi) * Qvr.y;
-					mVelocities[j].y = sin(phi) * Qvr.x + cos (phi) * Qvr.y;
+                    mVelocities[i].x = cosPhi * Pvr.x - sinPhi * Pvr.y;
+					mVelocities[i].y = sinPhi * Pvr.x + cosPhi * Pvr.y;
+                    mVelocities[j].x = cosPhi * Qvr.x - sinPhi * Qvr.y;
+					mVelocities[j].y = sinPhi * Qvr.x + cosPhi * Qvr.y;
+                    
+                    float Pke = 1e-18f * Pm * ((B.x * B.x) + (B.y * B.y));
+                    float Qke = 1e-18f * Qm * ((B.x * B.x) + (B.y * B.y));
+                    
+                    Ploc -> setImpact(Vec2f(mLocations[i].x + Pradius * cosPhi, mLocations[i].y + Pradius * sinPhi), Pke  ); //( ci::Vec2f impactLoc, float ke )
+                    Qloc -> setImpact(Vec2f(mLocations[j].x - Qradius * cosPhi, mLocations[j].y - Qradius * sinPhi), Qke  );
 				}
-
-				//Ploc -> setImpact();
-				//Qloc -> setImpact();
 			}
 
 			++Qloc;
@@ -237,7 +261,7 @@ void ParticleController::addParticles( unsigned numParticles )
 		centre.x += x;
 		centre.y += y;
 
-        float radius = Rand::randFloat(1.0f, 3.0f);
+        float radius = Rand::randFloat(1.0f, 4.0f);
         float mass   = 3580986219567.6f * /* 4/3 pi */ 4.18879020478638f * radius * radius * radius;
         
 		mParticles.push_back( Particle( centre, mFrameRate, mass, radius ) );
