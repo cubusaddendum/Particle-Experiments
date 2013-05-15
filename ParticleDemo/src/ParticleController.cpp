@@ -55,7 +55,7 @@ namespace
     */
     bool destroyed(Particle& particle)
 	{
-		if (particle.getMass() <= 0.0f)
+		if (particle.getRadius() < 1.0f)
 		{
 			return true;
 		}
@@ -76,7 +76,7 @@ ParticleController::ParticleController()
 **
 */
 
-void ParticleController::update()
+void ParticleController::update(const Perlin &perlin, const Channel32f &channel)
 {
     unsigned numParticles = mParticles.size();
 	float dT = 1.0f/mFrameRate;
@@ -203,8 +203,8 @@ void ParticleController::update()
 					mVelocities[j].y = sinPhi * Qvr.x + cosPhi * Qvr.y;
                     
                     //! Kinetic energy based on respective derived velocity on-axis (from the point of view of the observer)
-                    float Pke = 1e-17f * Pm * Pvrx * Pvrx;
-                    float Qke = 1e-17f * Qm * Qvrx * Qvrx;
+                    float Pke = 0.5f * Pm * Pvrx * Pvrx;
+                    float Qke = 0.5f * Qm * Qvrx * Qvrx;
                     
                     Ploc -> setImpact(Vec2f(mLocations[i].x + Pradius * cosPhi, mLocations[i].y + Pradius * sinPhi), Pke ); //( ci::Vec2f impactLoc, float ke )
                     Qloc -> setImpact(Vec2f(mLocations[j].x - Qradius * cosPhi, mLocations[j].y - Qradius * sinPhi), Qke );

@@ -15,6 +15,7 @@
 #include "cinder/gl/gl.h"
 #include "cinder/app/AppBasic.h"
 #include "cinder/CinderMath.h"
+#include "cinder/Rand.h"
 
 #define NTRAIL (10UL)
 #define NSCALE (0.1f) // 1/NTRAIL
@@ -26,45 +27,6 @@
 using namespace ci;
 using namespace ci::app;
 using namespace std;
-
-/*---------------------------------------------------------------------------
-**
-*/
-
-Particle::Particle( Vec2f location, float frameRate ) :
-    mPastLocations(),
-    mLoc(location),
-    mVel(Vec2f(0.0f, 0.0f)),
-    mLocImpact(Vec2f(0.0f, 0.0f)),
-    mMass(1500000000000000.0f), //1500000000000000.0f
-    mField(1.0f),
-    mRadius(5.0f),
-    mDT(1.0f/frameRate),
-	mImpact(0.0f),
-    mKe(0.0f)
-{
-    mPastLocations.resize(NTRAIL);
-    mPastLocations.assign (NTRAIL, mLoc);
-}
-
-/*---------------------------------------------------------------------------
- **
- */
-Particle::Particle( Vec2f location, float frameRate, float mass ) :
-    mPastLocations(),
-    mLoc(location),
-    mVel(Vec2f(0.0f, 0.0f)),
-    mLocImpact(Vec2f(0.0f, 0.0f)),
-    mMass(mass),
-    mField(1.0f),
-    mRadius(5.0f),
-    mDT(1.0f/frameRate),
-    mImpact(0.0f),
-    mKe(0.0f)
-{
-    mPastLocations.resize(NTRAIL);
-    mPastLocations.assign (NTRAIL, mLoc);
-}
 
 /*---------------------------------------------------------------------------
  **
@@ -79,7 +41,8 @@ Particle::Particle( Vec2f location, float frameRate, float mass, float radius ) 
     mRadius(radius),
     mDT(1.0f/frameRate),
     mImpact(0.0f),
-    mKe(0.0f)
+    mKe(0.0f),
+    mMassLossDueToImpactFactor(0.0025f)
 {
     mPastLocations.resize(NTRAIL);
     mPastLocations.assign (NTRAIL, mLoc);
@@ -92,6 +55,12 @@ Particle::Particle( Vec2f location, float frameRate, float mass, float radius ) 
 void Particle::update()
 {
     mLoc += mVel * mDT;
+    
+    if (mImpact > 0.0f)
+    {
+        damage();
+        mImpact -= 1.0f;
+    }
 }
 
 /*---------------------------------------------------------------------------
@@ -118,19 +87,13 @@ void Particle::draw()
 		float offset  = 4.0f - mImpact;
 		
 		gl::color (1.0f, 1.0f, 0.9f, 0.125f * mImpact);
-		gl::drawSolidCircle ( mLocImpact, (mKe * offset) + 1.0f);
-
-		mImpact -= 1.0f;
-        
-        //mMass -= mKe / (mVel.x * mVel.x + mVel.y * mVel.y);
-        //mRadius *= 0.9f;
+		gl::drawSolidCircle ( mLocImpact, (1e-16f * mKe * offset) + 1.0f, cinder::Rand::randInt(4,10));
 	}
 }
 
 /*---------------------------------------------------------------------------
 **
 */
-
 void Particle::updateTrail()
 {
     for (unsigned i = 0; i < NTRAIL - 1UL; ++i)
@@ -139,4 +102,15 @@ void Particle::updateTrail()
     }
     
     mPastLocations[NTRAIL - 1UL] = mLoc;
+}
+
+/*---------------------------------------------------------------------------
+ **
+ */
+void Particle::damage()
+{
+    float density = mMass / (/* 4/3 pi */ 4.18879020478638f * mRadius * mRadius * mRadius);
+    
+    mMass -= mMassLossDueToImpactFactor * mKe / (mVel.x * mVel.x + mVel.y * mVel.y);
+    mRadius = cinder::math<float>::pow((3.0f * mMass)/(/* 4pi */ 12.56637061435917f * density), 1.0f / 3.0f);
 }

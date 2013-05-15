@@ -14,6 +14,7 @@
 */
 
 #include "Particle.h"
+#include "cinder/Perlin.h"
 #include <list>
 #include <vector>
 #include <map>
@@ -29,7 +30,7 @@
 class ParticleController {
 public:
     ParticleController();
-    void update();
+    void update(const cinder::Perlin &perlin, const cinder::Channel32f &channel);
     void draw();
     void addParticles( unsigned numParticles );
     void removeParticles( unsigned numParticles );

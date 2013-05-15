@@ -8,6 +8,7 @@
 #include "cinder/gl/gl.h"
 #include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
+#include "cinder/Perlin.h"
 #include "Resources.h"
 
 /*---------------------------------------------------------------------------
@@ -31,6 +32,8 @@ public:
 	void draw();
 	
 	gl::Texture mImage;
+    Perlin      mPerlin;
+    Channel32f  mChannel;
 	
 	ParticleController mParticleController;
 };
@@ -54,6 +57,7 @@ void ParticleDemoApp::setup()
     mParticleController.setFrameRate( FRAMERATE );
 
     mImage = gl::Texture( loadImage( loadResource( RES_BACKGROUND_IMG ) ) );
+    mChannel = Channel32f( loadImage( loadResource( RES_BACKGROUND_IMG ) ) );
 
     gl::enableAlphaBlending( false	);
     
@@ -66,7 +70,7 @@ void ParticleDemoApp::setup()
 
 void ParticleDemoApp::update()
 {
-	mParticleController.update();
+	mParticleController.update(mPerlin, mChannel);
 }
 
 /*---------------------------------------------------------------------------

@@ -26,9 +26,8 @@ class Particle
 {
     
 public:
-	explicit Particle( ci::Vec2f location, float frameRate );
-    explicit Particle( ci::Vec2f location, float frameRate, float mass );
     explicit Particle( ci::Vec2f location, float frameRate, float mass, float radius );
+    
 	void update();
 	void draw();
     
@@ -51,6 +50,7 @@ public:
 protected:
     
     void updateTrail();
+    void damage();
     
     std::vector<ci::Vec2f> mPastLocations;
     
@@ -64,6 +64,7 @@ protected:
     float       mDT;
 	float       mImpact;
     float       mKe;
+    float       mMassLossDueToImpactFactor;
     
 };
 #endif /* defined(__ParticleDemo__Particle__) */
