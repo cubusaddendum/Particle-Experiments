@@ -130,11 +130,6 @@ void ParticleController::update()
         Vec2f g = dhat * Vec2f(GravConst * sdx * Nmass / d2, GravConst * sdy * Nmass / d2);
         
         mVelocities[i] += g * dT;
-        
-        /*Vec2f acc = Vec2f(GravConst * sdx * Nmass / cinder::math< float >::pow(Vec2f(cog - dT * mVelocities[i]).x, 2.0f),
-			GravConst * sdy * Nmass / cinder::math< float >::pow(Vec2f(cog - dT * mVelocities[i]).y, 2.0f));
-        
-        mVelocities[i] += acc * dT;*/
     }
 
 	list<Particle>::iterator Ploc = mParticles.begin();
@@ -207,11 +202,12 @@ void ParticleController::update()
                     mVelocities[j].x = cosPhi * Qvr.x - sinPhi * Qvr.y;
 					mVelocities[j].y = sinPhi * Qvr.x + cosPhi * Qvr.y;
                     
-                    float Pke = 1e-18f * Pm * ((B.x * B.x) + (B.y * B.y));
-                    float Qke = 1e-18f * Qm * ((B.x * B.x) + (B.y * B.y));
+                    //! Kinetic energy based on respective derived velocity on-axis (from the point of view of the observer)
+                    float Pke = 1e-17f * Pm * Pvrx * Pvrx;
+                    float Qke = 1e-17f * Qm * Qvrx * Qvrx;
                     
-                    Ploc -> setImpact(Vec2f(mLocations[i].x + Pradius * cosPhi, mLocations[i].y + Pradius * sinPhi), Pke  ); //( ci::Vec2f impactLoc, float ke )
-                    Qloc -> setImpact(Vec2f(mLocations[j].x - Qradius * cosPhi, mLocations[j].y - Qradius * sinPhi), Qke  );
+                    Ploc -> setImpact(Vec2f(mLocations[i].x + Pradius * cosPhi, mLocations[i].y + Pradius * sinPhi), Pke ); //( ci::Vec2f impactLoc, float ke )
+                    Qloc -> setImpact(Vec2f(mLocations[j].x - Qradius * cosPhi, mLocations[j].y - Qradius * sinPhi), Qke );
 				}
 			}
 
@@ -261,7 +257,7 @@ void ParticleController::addParticles( unsigned numParticles )
 		centre.x += x;
 		centre.y += y;
 
-        float radius = Rand::randFloat(1.0f, 4.0f);
+        float radius = Rand::randFloat(1.0f, 3.0f);
         float mass   = 3580986219567.6f * /* 4/3 pi */ 4.18879020478638f * radius * radius * radius;
         
 		mParticles.push_back( Particle( centre, mFrameRate, mass, radius ) );
