@@ -42,7 +42,8 @@ Particle::Particle( Vec2f location, float frameRate, float mass, float radius ) 
     mDT(1.0f/frameRate),
     mImpact(0.0f),
     mKe(0.0f),
-    mMassLossDueToImpactFactor(0.0025f)
+    mMassLossDueToImpactFactor(0.0025f),
+    bIsColliding(false)
 {
     mPastLocations.resize(NTRAIL);
     mPastLocations.assign (NTRAIL, mLoc);
@@ -60,6 +61,10 @@ void Particle::update()
     {
         damage();
         mImpact -= 1.0f;
+    }
+    else
+    {
+        bIsColliding = false;
     }
 }
 
@@ -82,7 +87,7 @@ void Particle::draw()
 		scale *= 1.2f;
     }
 
-	if (mImpact > 0.0f)
+	if (bIsColliding)
 	{
 		float offset  = 4.0f - mImpact;
 		

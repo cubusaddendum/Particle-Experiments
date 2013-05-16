@@ -45,7 +45,7 @@ public:
     inline void setField ( float field ) { mField = field; }
 	inline void setRadius ( float radius ) { mRadius = radius; }
 
-	inline void setImpact ( ci::Vec2f location, float ke ) { mLocImpact = location; mKe = ke; if (mImpact == 0.0f) mImpact = 4.0f; }
+	inline void setImpact ( ci::Vec2f location, float ke ) { mLocImpact = location; mKe = ke; bIsColliding = true; if (mImpact == 0.0f) mImpact = 4.0f; }
 
 protected:
     
@@ -65,6 +65,8 @@ protected:
 	float       mImpact;
     float       mKe;
     float       mMassLossDueToImpactFactor;
+    
+    bool        bIsColliding;
     
 };
 #endif /* defined(__ParticleDemo__Particle__) */
