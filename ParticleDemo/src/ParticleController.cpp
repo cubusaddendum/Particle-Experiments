@@ -258,7 +258,7 @@ void ParticleController::addParticles( unsigned numParticles )
 		centre.y += y;
 
         float radius = Rand::randFloat(1.0f, 3.0f);
-        float mass   = 3580986219567.6f * /* 4/3 pi */ 4.18879020478638f * radius * radius * radius;
+        float mass   = /* 4/3 pi */ 4.18879020478638f * radius * radius * radius * 1000.0f; // assume density of 1000.0
         
 		mParticles.push_back( Particle( centre, mFrameRate, mass, radius ) );
 	}

@@ -36,7 +36,7 @@ Particle::Particle( Vec2f location, float frameRate, float mass, float radius ) 
     mLoc(location),
     mVel(Vec2f(0.0f, 0.0f)),
     mLocImpact(Vec2f(0.0f, 0.0f)),
-    mMass(mass),
+    mMass(35809862195.676f * mass),
     mField(1.0f),
     mRadius(radius),
     mDT(1.0f/frameRate),
@@ -92,7 +92,7 @@ void Particle::draw()
 		float offset  = 4.0f - mImpact;
 		
 		gl::color (1.0f, 1.0f, 0.9f, 0.125f * mImpact);
-		gl::drawSolidCircle ( mLocImpact, (1e-16f * mKe * offset) + 1.0f, cinder::Rand::randInt(4,10));
+		gl::drawSolidCircle ( mLocImpact, (5e-19f * mKe * offset) + 1.0f, cinder::Rand::randInt(7,10));
 	}
 }
 
