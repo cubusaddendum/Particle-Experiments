@@ -1,0 +1,4 @@
+#include "../include/Resources.h"
+
+128	ICON	"..\\resources\\cinder_app_icon.ico"
+129	IMAGE "..\\resources\\image.jpg"
