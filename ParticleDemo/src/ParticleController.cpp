@@ -26,29 +26,9 @@ using std::list;
 
 namespace 
 {
-    static const float GravConst = 6.667221937e-11;
+    static const float GravConst = 6.667221937e-11f;
     
-    /*---------------------------------------------------------------------------
-    **
-    */
-	bool outofbounds(Particle& particle) 
-	{
-		float rightbound = 1.1f * static_cast<float>(app::getWindowWidth());
-		float lowerbound = 1.1f * static_cast<float>(app::getWindowHeight());
-		float leftbound  = - (rightbound - static_cast<float>(app::getWindowWidth()));
-		float upperbound = - (lowerbound - static_cast<float>(app::getWindowHeight()));
 
-		if (   ( particle.getLocation().x > rightbound ) 
-			|| ( particle.getLocation().y > lowerbound) 
-			|| ( particle.getLocation().x < leftbound)
-			|| ( particle.getLocation().y < upperbound)
-			)
-		{
-			return true;
-		}
-
-		return false;
-	}
     
     /*---------------------------------------------------------------------------
     **
@@ -62,12 +42,24 @@ namespace
         
 		return false;
 	}
+
+    /*---------------------------------------------------------------------------
+    **
+    */
+	bool dead(Impact& impact)
+	{
+		if (impact.isDead())
+		{
+			return true;
+		}
+
+		return false;
+	}
 };
 
 /*---------------------------------------------------------------------------
 **
 */
-
 ParticleController::ParticleController()
 {
 }
@@ -75,20 +67,19 @@ ParticleController::ParticleController()
 /*---------------------------------------------------------------------------
 **
 */
-
 void ParticleController::update(const Perlin &perlin, const Channel32f &channel)
 {
     unsigned numParticles = mParticles.size();
 	float dT = 1.0f/mFrameRate;
 	
-
 	mParticles.remove_if (outofbounds);
     mParticles.remove_if (destroyed);
+	mImpacts.remove_if (dead);
 
 	addParticles( numParticles - mParticles.size() );
  
-    mLocations.assign(numParticles, Vec2f(0.0f,0.0f));
-    mVelocities.assign(numParticles, Vec2f(0.0f,0.0f));
+    mLocations.assign(numParticles, Vec2f(0.0f, 0.0f));
+    mVelocities.assign(numParticles, Vec2f(0.0f, 0.0f));
 
 	mCollisions.clear();
     
@@ -205,6 +196,11 @@ void ParticleController::update(const Perlin &perlin, const Channel32f &channel)
                     //! Kinetic energy based on respective derived velocity on-axis (from the point of view of the observer)
                     float Pke = 0.5f * Pm * Pvrx * Pvrx;
                     float Qke = 0.5f * Qm * Qvrx * Qvrx;
+
+					//! Calculate drift in impact particles between major masses
+					Vec2f drift = 0.1f * (mVelocities[j] - mVelocities[i]);
+
+					mImpacts.push_back(Impact(Vec2f(mLocations[i].x + Pradius * cosPhi, mLocations[i].y + Pradius * sinPhi), drift, Pke + Qke, mFrameRate));
                     
                     Ploc -> setImpact(Vec2f(mLocations[i].x + Pradius * cosPhi, mLocations[i].y + Pradius * sinPhi), Pke ); //( ci::Vec2f impactLoc, float ke )
                     Qloc -> setImpact(Vec2f(mLocations[j].x - Qradius * cosPhi, mLocations[j].y - Qradius * sinPhi), Qke );
@@ -224,24 +220,32 @@ void ParticleController::update(const Perlin &perlin, const Channel32f &channel)
         p -> setVelocity(mVelocities[n++]);
 		p -> update();
 	}
-}
 
-/*---------------------------------------------------------------------------
-**
-*/
-
-void ParticleController::draw()
-{
-	for( list<Particle>::iterator p = mParticles.begin(); p != mParticles.end(); ++p )
-    {
-		p -> draw();
+	for( list<Impact>::iterator imp = mImpacts.begin(); imp != mImpacts.end(); ++imp)
+	{
+		imp -> update(perlin, channel);
 	}
 }
 
 /*---------------------------------------------------------------------------
 **
 */
+void ParticleController::draw()
+{
+	for( list<Particle>::iterator p = mParticles.begin(); p != mParticles.end(); ++p )
+    {
+		p -> draw();
+	}
 
+	for( list<Impact>::iterator imp = mImpacts.begin(); imp != mImpacts.end(); ++imp )
+    {
+		imp -> draw();
+	}
+}
+
+/*---------------------------------------------------------------------------
+**
+*/
 void ParticleController::addParticles( unsigned numParticles )
 {
 	for( unsigned i = 0u; i < numParticles; i++ )
@@ -249,7 +253,7 @@ void ParticleController::addParticles( unsigned numParticles )
 		Vec2f centre = Vec2f(static_cast<float>(app::getWindowWidth() >> 1), static_cast<float>(app::getWindowHeight() >> 1)); 
 
 		float rwidth = Rand::randFloat(-1.0f,1.0f) * static_cast<float>(app::getWindowWidth() < app::getWindowHeight() ? app::getWindowWidth() >> 1 : app::getWindowHeight() >> 1);
-		float theta  = Rand::randFloat(6.283185307179586476925286766559f); 
+		float theta  = Rand::randFloat(6.283185307179586476925286766559f); //! 2 * Pi
 
 		float x = rwidth * sin(theta); 	
 		float y = rwidth * cos(theta);
@@ -267,7 +271,6 @@ void ParticleController::addParticles( unsigned numParticles )
 /*---------------------------------------------------------------------------
 **
 */
-
 void ParticleController::removeParticles( unsigned numParticles )
 {
 	for( unsigned i = 0u; i < numParticles; i++ )

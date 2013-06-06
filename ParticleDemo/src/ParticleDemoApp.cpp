@@ -59,7 +59,7 @@ void ParticleDemoApp::setup()
     mImage = gl::Texture( loadImage( loadResource( RES_BACKGROUND_IMG ) ) );
     mChannel = Channel32f( loadImage( loadResource( RES_BACKGROUND_IMG ) ) );
 
-    gl::enableAlphaBlending( false	);
+    gl::enableAlphaBlending( false );
     
 	mParticleController.addParticles( 150 );
 }
@@ -83,7 +83,7 @@ void ParticleDemoApp::draw()
 	
 	mImage.enableAndBind();
     gl::color( 1.0f, 1.0f, 1.0f);
-	gl::draw( mImage, getWindowBounds() );
+	//gl::draw( mImage, getWindowBounds() );
 	
 	glDisable( GL_TEXTURE_2D );
 	glColor3f( 1, 1, 1 );

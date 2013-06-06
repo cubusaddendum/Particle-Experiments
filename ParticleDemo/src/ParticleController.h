@@ -14,6 +14,7 @@
 */
 
 #include "Particle.h"
+#include "ImpactEngine.h"
 #include "cinder/Perlin.h"
 #include <list>
 #include <vector>
@@ -30,7 +31,7 @@
 class ParticleController {
 public:
     ParticleController();
-    void update(const cinder::Perlin &perlin, const cinder::Channel32f &channel);
+    void update(const cinder::Perlin& perlin, const cinder::Channel32f& channel);
     void draw();
     void addParticles( unsigned numParticles );
     void removeParticles( unsigned numParticles );
@@ -42,6 +43,7 @@ protected:
     std::vector<ci::Vec2f> mLocations;
     std::vector<ci::Vec2f> mVelocities;
 	std::multimap<unsigned, unsigned> mCollisions;
+	std::list<Impact> mImpacts;
     
     float mFrameRate;
 };

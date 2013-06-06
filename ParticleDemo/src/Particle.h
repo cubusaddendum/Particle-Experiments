@@ -15,8 +15,14 @@
 
 #include "cinder/Channel.h"
 #include "cinder/Vector.h"
+#include "cinder/Color.h"
+#include "cinder/Perlin.h"
 
 #include <vector>
+
+class Particle;
+
+bool outofbounds(Particle& particle); 
 
 /*---------------------------------------------------------------------------
 **
@@ -29,7 +35,9 @@ public:
     explicit Particle( ci::Vec2f location, float frameRate, float mass, float radius );
     
 	void update();
+	void update( const ci::Perlin &perlin, const ci::Channel32f &channel );
 	void draw();
+	void drawNoTrail();
     
 	inline ci::Vec2f getLocation() { return	mLoc; }
 	inline ci::Vec2f getVelocity() { return mVel; }
@@ -65,8 +73,16 @@ protected:
 	float       mImpact;
     float       mKe;
     float       mMassLossDueToImpactFactor;
+	float		mBrightness;
     
     bool        bIsColliding;
+
+	float		mDecay;
+	float		mScale;
+	int			mAge;
+	int			mLifespan;
+	float		mAgePer;
+	bool		mIsDead;
     
 };
 #endif /* defined(__ParticleDemo__Particle__) */
