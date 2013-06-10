@@ -18,6 +18,7 @@
 		0CE851B1171C2BC900C1C225 /* Particle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CE851AD171C2BC900C1C225 /* Particle.cpp */; };
 		0CE851B2171C2BC900C1C225 /* ParticleController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CE851AF171C2BC900C1C225 /* ParticleController.cpp */; };
 		0CE851B4171C2C0300C1C225 /* image.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0CE851B3171C2C0300C1C225 /* image.jpg */; };
+		0CF34B7E1766741E009BFDF4 /* ImpactEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0CF34B7C1766741E009BFDF4 /* ImpactEngine.cpp */; };
 		5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B10EAFCA74003A9687 /* CoreVideo.framework */; };
 		5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B50EAFCA7E003A9687 /* QTKit.framework */; };
 		53E3CDFC0E86099300238D2B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53E3CDFB0E86099300238D2B /* Carbon.framework */; };
@@ -38,6 +39,8 @@
 		0CE851AF171C2BC900C1C225 /* ParticleController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParticleController.cpp; path = ../src/ParticleController.cpp; sourceTree = "<group>"; };
 		0CE851B0171C2BC900C1C225 /* ParticleController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParticleController.h; path = ../src/ParticleController.h; sourceTree = "<group>"; };
 		0CE851B3171C2C0300C1C225 /* image.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = image.jpg; path = ../resources/image.jpg; sourceTree = "<group>"; };
+		0CF34B7C1766741E009BFDF4 /* ImpactEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ImpactEngine.cpp; path = ../src/ImpactEngine.cpp; sourceTree = "<group>"; };
+		0CF34B7D1766741E009BFDF4 /* ImpactEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ImpactEngine.h; path = ../src/ImpactEngine.h; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
@@ -74,6 +77,7 @@
 		080E96DDFE201D6D7F000001 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				0CF34B7C1766741E009BFDF4 /* ImpactEngine.cpp */,
 				0CE851AF171C2BC900C1C225 /* ParticleController.cpp */,
 				0CE851AD171C2BC900C1C225 /* Particle.cpp */,
 				00BAE6590E7ED9C10018A608 /* ParticleDemoApp.cpp */,
@@ -131,6 +135,7 @@
 		29B97315FDCFA39411CA2CEA /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				0CF34B7D1766741E009BFDF4 /* ImpactEngine.h */,
 				0CE851AE171C2BC900C1C225 /* Particle.h */,
 				0CE851B0171C2BC900C1C225 /* ParticleController.h */,
 				32CA4F630368D1EE00C91783 /* ParticleDemo_Prefix.pch */,
@@ -222,6 +227,7 @@
 				00BAE65A0E7ED9C10018A608 /* ParticleDemoApp.cpp in Sources */,
 				0CE851B1171C2BC900C1C225 /* Particle.cpp in Sources */,
 				0CE851B2171C2BC900C1C225 /* ParticleController.cpp in Sources */,
+				0CF34B7E1766741E009BFDF4 /* ImpactEngine.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

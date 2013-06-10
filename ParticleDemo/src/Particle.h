@@ -20,9 +20,10 @@
 
 #include <vector>
 
-class Particle;
+//class Particle;
 
-bool outofbounds(Particle& particle); 
+//bool outofbounds(Particle& particle);
+
 
 /*---------------------------------------------------------------------------
 **
@@ -54,6 +55,8 @@ public:
 	inline void setRadius ( float radius ) { mRadius = radius; }
 
 	inline void setImpact ( ci::Vec2f location, float ke ) { mLocImpact = location; mKe = ke; bIsColliding = true; if (mImpact == 0.0f) mImpact = 4.0f; }
+    
+    static bool outofbounds(Particle& particle);
 
 protected:
     

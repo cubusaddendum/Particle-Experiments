@@ -29,9 +29,10 @@ using namespace ci::app;
 using namespace std;
 
 /*---------------------------------------------------------------------------
-**
+** Static!
 */
-bool outofbounds(Particle& particle) 
+bool
+Particle::outofbounds(Particle& particle)
 {
 	float rightbound = 1.2f * static_cast<float>(getWindowWidth());
 	float lowerbound = 1.2f * static_cast<float>(getWindowHeight());

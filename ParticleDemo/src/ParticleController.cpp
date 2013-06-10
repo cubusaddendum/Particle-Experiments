@@ -72,7 +72,7 @@ void ParticleController::update(const Perlin &perlin, const Channel32f &channel)
     unsigned numParticles = mParticles.size();
 	float dT = 1.0f/mFrameRate;
 	
-	mParticles.remove_if (outofbounds);
+	mParticles.remove_if (Particle::outofbounds);
     mParticles.remove_if (destroyed);
 	mImpacts.remove_if (dead);
 
