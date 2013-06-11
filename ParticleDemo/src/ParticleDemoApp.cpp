@@ -61,7 +61,7 @@ void ParticleDemoApp::setup()
 
     gl::enableAlphaBlending( false );
     
-	mParticleController.addParticles( 150 );
+	mParticleController.addParticles( 120 );
 }
 
 /*---------------------------------------------------------------------------

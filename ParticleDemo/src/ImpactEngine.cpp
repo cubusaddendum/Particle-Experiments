@@ -27,7 +27,7 @@ Impact::Impact(const Vec2f& loc, const Vec2f& vel, const float ke, const float f
 	, mThreshold(10.0f)
 	, mDT(1.0f/framerate)
 {
-	addParticles( 3u );
+	addParticles( 1u );
 }
 
 /*---------------------------------------------------------------------------
