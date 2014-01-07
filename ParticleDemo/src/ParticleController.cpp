@@ -91,9 +91,6 @@ void ParticleController::update(const Perlin &perlin, const Channel32f &channel)
         Nmass += p -> getMass();
     }
     
-    //! Invert Nmass to take division out of the following recursion
-    Nmass = 1.0f / Nmass;
-    
     //! Acquire centre of particle gravity
     Vec2f cog = Vec2f(0.0f,0.0f);
     unsigned n = 0u;
@@ -101,11 +98,13 @@ void ParticleController::update(const Perlin &perlin, const Channel32f &channel)
    	for( list<Particle>::iterator p = mParticles.begin(); p != mParticles.end(); ++p)
     {
 		mLocations[n] = ( p -> getLocation() );
-		cog += mLocations[n] * p -> getMass() * Nmass; //! effectively divided-by Nmass
+		cog += mLocations[n] * p -> getMass();
         mVelocities[n++] = ( p -> getVelocity() );
 	}
     
-    Nmass = 1.0f / Nmass; //! Invert again to avoid division in the next recursion
+    cog /= Nmass;
+    
+    //!
     
     for ( unsigned i = 0u; i < numParticles; ++i )
     {

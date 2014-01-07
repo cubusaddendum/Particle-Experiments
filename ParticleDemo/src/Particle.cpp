@@ -17,8 +17,8 @@
 #include "cinder/CinderMath.h"
 #include "cinder/Rand.h"
 
-#define NTRAIL (10UL)
-#define NSCALE (0.1f) // 1/NTRAIL
+#define NTRAIL (8UL)
+#define NSCALE (0.125f) // 1/NTRAIL
 
 /*---------------------------------------------------------------------------
 **
